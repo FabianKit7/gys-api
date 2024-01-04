@@ -70,7 +70,7 @@ app.post('/api/send_sms', async (req, res) => {
   const smsData = {
     type: 'transactional',
     unicodeEnabled: true,
-    sender: 'gysm',
+    sender: 'gys',
     recipient,
     content
   };

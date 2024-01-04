@@ -26,7 +26,7 @@ export const sendSMS = async (content) => {
         const smsData = {
             type: 'transactional',
             unicodeEnabled: false,
-            sender: 'gysm',
+            sender: 'gys',
             recipient,
             content
         };
