@@ -9,20 +9,20 @@ export const INCORRECT_PASSWORD_TEMPLATE = (full_name, username) => {
 
 <p class="MsoNormal"><span lang="EN">We regret to inform you that the password
 provided for @<b>${username}</b>, to access our service is incorrect. We kindly request
-you to attempt re-logging into your dashboard by following this <a href="http://app.Liftinfluence.com"><span style="color:#1155CC">link</span></a>.
+you to attempt re-logging into your dashboard by following this <a href="http://app.grow-your-social.com"><span style="color:#1155CC">link</span></a>.
 Once the correct password is provided, our team will proceed to log in to your
 account within the next 24 hours.</span></p>
 
 <p class="MsoNormal"><span lang="EN"><o:p>&nbsp;</o:p></span></p>
 
 <p class="MsoNormal"><span lang="EN">Should you require further assistance, please
-do not hesitate to contact us at support@Liftinfluence.com.</span></p>
+do not hesitate to contact us at support@grow-your-social.com.</span></p>
 
 <p class="MsoNormal"><span lang="EN"><o:p>&nbsp;</o:p></span></p>
 
 <p class="MsoNormal"><span lang="EN">Best regards,</span></p>
 
-<p class="MsoNormal"><span class="SpellE"><span lang="EN">Liftinfluence</span></span><span lang="EN"> Team</span></p>
+<p class="MsoNormal"><span class="SpellE"><span lang="EN">Grow-your-social</span></span><span lang="EN"> Team</span></p>
 </div>
 `
 }
@@ -70,7 +70,7 @@ throughout the process.</span></p>
 <p class="MsoNormal"><span lang="EN"><o:p>&nbsp;</o:p></span></p>
 
 <p class="MsoNormal"><span lang="EN">After completing the steps above we kindly
-request you to attempt re-logging into your dashboard by following this <a href="http://app.Liftinfluence.com"><span style="color:#1155CC">link</span></a></span></p>
+request you to attempt re-logging into your dashboard by following this <a href="http://app.grow-your-social.com"><span style="color:#1155CC">link</span></a></span></p>
 
 <p class="MsoNormal"><span lang="EN"><o:p>&nbsp;</o:p></span></p>
 
@@ -78,7 +78,7 @@ request you to attempt re-logging into your dashboard by following this <a href=
 
 <p class="MsoNormal"><span lang="EN">If you have any concerns or require further
 assistance, please do not hesitate to reach out to us at
-support@Liftinfluence.com. Our dedicated support team is ready to assist you.</span></p>
+support@grow-your-social.com. Our dedicated support team is ready to assist you.</span></p>
 
 <p class="MsoNormal"><span lang="EN"><o:p>&nbsp;</o:p></span></p>
 
@@ -88,7 +88,7 @@ support@Liftinfluence.com. Our dedicated support team is ready to assist you.</s
 
 <p class="MsoNormal"><span lang="EN">Kind regards,</span></p>
 
-<p class="MsoNormal"><span class="SpellE"><span lang="EN">Liftinfluence</span></span><span lang="EN"> Team</span></p>
+<p class="MsoNormal"><span class="SpellE"><span lang="EN">Grow-your-social</span></span><span lang="EN"> Team</span></p>
 </div>
 
 `
@@ -104,7 +104,7 @@ export const NOT_CONNECTED_TEMPLATE = (full_name) => {
 <p class="MsoNormal"><span lang="EN">We would like to bring to your attention that
 you are currently not connected to our service. We kindly request you to
 establish the connection at your earliest convenience by clicking on the
-provided <a href="http://app.Liftinfluence.com"><span style="color:#1155CC">link</span></a>.
+provided <a href="http://app.grow-your-social.com"><span style="color:#1155CC">link</span></a>.
 By doing so, we can promptly initiate the growth process for your account.</span></p>
 
 <p class="MsoNormal"><span lang="EN"><o:p>&nbsp;</o:p></span></p>
@@ -142,7 +142,7 @@ you with the support you need.</span></p>
 
 <p class="MsoNormal"><span lang="EN">Kind regards,</span></p>
 
-<p class="MsoNormal"><span class="SpellE"><span lang="EN">Liftinfluence</span></span><span lang="EN"> Team.</span></p>
+<p class="MsoNormal"><span class="SpellE"><span lang="EN">Grow-your-social</span></span><span lang="EN"> Team.</span></p>
 </div>
 `
 }

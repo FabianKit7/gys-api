@@ -27,7 +27,7 @@ const transporter = NodeMailer.createTransport({
 const send_email = (to, subject, content) => {
   console.log(`to: ${to}, subject: ${subject}`);
   transporter.sendMail(
-    { from: "LiftInfluence hello@liftinfluence.com", to, subject, html: content, sender: { name: "LiftInfluence", email: "hello@liftinfluence.com" }, },
+    { from: "Grow-your-social hello@grow-your-social.com", to, subject, html: content, sender: { name: "Grow-your-social", email: "hello@grow-your-social.com" }, },
     (error, info) => {
       if (error) {
         console.log(error);
@@ -70,7 +70,7 @@ app.post('/api/send_sms', async (req, res) => {
   const smsData = {
     type: 'transactional',
     unicodeEnabled: true,
-    sender: 'LiftInflue',
+    sender: 'gysm',
     recipient,
     content
   };
