@@ -6,7 +6,8 @@ import { createClient } from '@supabase/supabase-js';
 
 dotenv.config({ path: '.env' });
 const router = express.Router();
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const SK = process.env.NODE_ENV === "production" ? process.env.STRIPE_SECRET_KEY : "sk_test_51LY8WXGqRSmA1tlMkLI09WQj5UZGO70XiSETYHWo27q4pxK8ywZCA867dJAfj7hKjeuBqHGeDl8WDAJpbcKxVxC200lcwZynJz"
+const stripe = new Stripe(SK);
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
@@ -16,39 +17,39 @@ router.post('/', async (req, res) => {
     return res.json({});
 });
 
-export const sendSMS = async (content) => {
-    const apiKey = process.env.BREVO_SMS_API_KEY;
-    const apiUrl = 'https://api.brevo.com/v3/transactionalSMS/sms';
+// export const sendSMS = async (content) => {
+//     const apiKey = process.env.BREVO_SMS_API_KEY;
+//     const apiUrl = 'https://api.brevo.com/v3/transactionalSMS/sms';
 
-    // const recipients = ['+2348112659304'];
-    const recipients = ['+38631512279', '+387603117027'];
-    for (const recipient of recipients) {
-        const smsData = {
-            type: 'transactional',
-            unicodeEnabled: false,
-            sender: 'gys',
-            recipient,
-            content
-        };
+//     // const recipients = ['+2348112659304'];
+//     const recipients = ['+38631512279', '+387603117027'];
+//     for (const recipient of recipients) {
+//         const smsData = {
+//             type: 'transactional',
+//             unicodeEnabled: false,
+//             sender: 'gys',
+//             recipient,
+//             content
+//         };
 
-        await axios
-            .post(apiUrl, smsData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'api-key': apiKey,
-                    'Accept': 'application/json'
-                }
-            })
-            .then((response) => {
-                console.log('SMS sent successfully:', response.data);
-                return ({ success: true, message: 'SMS sent successfully' })
-            })
-            .catch((error) => {
-                console.error('Error sending SMS:', error);
-                return ({ success: false, message: `Error sending SMS: ${error}` })
-            });
-    }
-}
+//         await axios
+//             .post(apiUrl, smsData, {
+//                 headers: {
+//                     'Content-Type': 'application/json',
+//                     'api-key': apiKey,
+//                     'Accept': 'application/json'
+//                 }
+//             })
+//             .then((response) => {
+//                 console.log('SMS sent successfully:', response.data);
+//                 return ({ success: true, message: 'SMS sent successfully' })
+//             })
+//             .catch((error) => {
+//                 console.error('Error sending SMS:', error);
+//                 return ({ success: false, message: `Error sending SMS: ${error}` })
+//             });
+//     }
+// }
 
 
 function getUnixTimestampForSevenDaysLater() {
@@ -64,7 +65,7 @@ router.post('/create_subscription', async (req, res) => {
         const { username, name, email, paymentMethod, price } = req.body;
         // console.log({ name, email, paymentMethod, price });
         const customer = await stripe.customers.create({
-            name, email,
+            name: name || username || '', email,
             payment_method: paymentMethod,
             invoice_settings: { default_payment_method: paymentMethod }
         })
@@ -88,16 +89,16 @@ router.post('/create_subscription', async (req, res) => {
             expand: ['latest_invoice.payment_intent']
         }
         // check if user's username is in the freeTrialAllowed list
-        var is_allowed = false;
-        try {
-            const { data } = await supabase.from('freeTrialAllowed').select().eq('username', username).single()
-            is_allowed = data ? true : false;
-            if (!is_allowed) {
-                delete subData.trial_end;
-            }
-        } catch (err) {
-            delete subData.trial_end;
-        }
+        var is_allowed = true;
+        // try {
+        //     const { data } = await supabase.from('freeTrialAllowed').select().eq('username', username).single()
+        //     is_allowed = data ? true : false;
+        //     if (!is_allowed) {
+        //         delete subData.trial_end;
+        //     }
+        // } catch (err) {
+        //     delete subData.trial_end;
+        // }
         const subscription = await stripe.subscriptions.create(subData)
 
         // console.log({
@@ -108,9 +109,9 @@ router.post('/create_subscription', async (req, res) => {
         // });
 
         if (subscription) {
-            // await sendSMS(`@${username} with email ${email} has just registered for a free trial. \n+15 portions cevapa kod cesma added.`);
+            // await sendSMS(`@${username} with email ${email} has just registered for a free trial.`);
             // console.log(`Subscription created for ${email} \n trial ends at: ${trial_end} \n`);
-            await sendSMS(`@${username} with email ${email} has just registered. \n+15 portions cevapa kod cesma added. ${is_allowed && ' with free trial.'}`);
+            // await sendSMS(`@${username} with email ${email} has just registered. ${is_allowed && ' with free trial.'}`);
             console.log(`Subscription created for ${email} \n ${is_allowed && ' with free trial'}`);
         }
 
