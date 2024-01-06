@@ -59,6 +59,32 @@ function getUnixTimestampForSevenDaysLater() {
     return Math.floor(sevenDaysLater.getTime() / 1000); // Convert to Unix timestamp (in seconds)
 }
 
+router.post("/create_payment_intent", async (req, res) => {
+    try {
+      // const { amount } = req.body;
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency: "USD",
+        payment_method_types: ["card"],
+        // payment_method_types: ['card', 'apple_pay', 'google_pay'],
+        // automatic_payment_methods: {
+        //     enabled: true
+        // },
+      });
+  
+      // console.log('paymentIntent');
+      // console.log(paymentIntent);
+  
+      return res.status(200).json({
+        clientSecret: paymentIntent?.client_secret,
+        paymentIntent,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: `Internal server error: ${error}` });
+    }
+  });
+
 // new subscription with 7days trial.
 router.post('/create_subscription', async (req, res) => {
     try {
