@@ -154,10 +154,9 @@ router.post('/create_subscription', async (req, res) => {
             customer,
             subscription,
             clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
-            st:'lkds'
         });
     } catch (error) {
-        // console.error(error);
+        console.error(error);
         return res.status(500).json({ message: `${error}` });
     }
 });
