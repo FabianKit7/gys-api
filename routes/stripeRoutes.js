@@ -111,9 +111,8 @@ router.post("/create_subscription", async (req, res) => {
       return res.status(500).json({ message: `failed to get or create customer` });
     }
 
-    // const product = await stripe.products.create({
-    //     name: "Monthly Subscription",
-    // })
+    console.log("customer");
+    console.log(customer);
 
     const trial_end = getUnixTimestampForSevenDaysLater(); //# 7 days free trial
     const subData = {
