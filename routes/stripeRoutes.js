@@ -95,13 +95,11 @@ router.post("/create_subscription", async (req, res) => {
     // console.log({ name, email, paymentMethod, price });
     var customer = null;
     if (customer_id) {
-      const customerRes = await stripe.customers
-        .retrieve(customer_id)
-        .catch((err) => err);
-        
-      if (customerRes) {
-        customer = customerRes;
-      } else {
+      try {
+        customer = await stripe.customers
+          .retrieve(customer_id)
+          .catch((err) => err);
+      } catch (error) {
         customer = await stripe.customers.create({
           name: name || username || "",
           email,
