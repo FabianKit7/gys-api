@@ -98,7 +98,7 @@ router.post("/create_subscription", async (req, res) => {
       try {
         customer = await stripe.customers
           .retrieve(customer_id)
-          .catch((err) => err);
+        //   .catch((err) => err);
       } catch (error) {
         customer = await stripe.customers.create({
           name: name || username || "",
