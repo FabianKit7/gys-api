@@ -122,8 +122,8 @@ router.post("/create_subscription", async (req, res) => {
         .json({ message: `failed to get or create customer` });
     }
 
-    console.log("customer");
-    console.log(customer);
+    // console.log("customer");
+    // console.log(customer);
 
     const trial_end = getUnixTimestampForSevenDaysLater(); //# 7 days free trial
     const subData = {
