@@ -95,9 +95,20 @@ router.post("/create_subscription", async (req, res) => {
     // console.log({ name, email, paymentMethod, price });
     var customer = null;
     if (customer_id) {
-      customer = await stripe.customers
+      const customerRes = await stripe.customers
         .retrieve(customer_id)
         .catch((err) => err);
+        
+      if (customerRes) {
+        customer = customerRes;
+      } else {
+        customer = await stripe.customers.create({
+          name: name || username || "",
+          email,
+          payment_method: paymentMethod,
+          invoice_settings: { default_payment_method: paymentMethod },
+        });
+      }
     } else {
       customer = await stripe.customers.create({
         name: name || username || "",
@@ -108,7 +119,9 @@ router.post("/create_subscription", async (req, res) => {
     }
 
     if (!customer) {
-      return res.status(500).json({ message: `failed to get or create customer` });
+      return res
+        .status(500)
+        .json({ message: `failed to get or create customer` });
     }
 
     console.log("customer");
