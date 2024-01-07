@@ -88,13 +88,21 @@ router.post("/create_payment_intent", async (req, res) => {
 // new subscription with 7days trial.
 router.post('/create_subscription', async (req, res) => {
     try {
-        const { username, name, email, paymentMethod, price } = req.body;
+        const { username, name, email, paymentMethod, price, customer_id } = req.body;
         // console.log({ name, email, paymentMethod, price });
-        const customer = await stripe.customers.create({
-            name: name || username || '', email,
-            payment_method: paymentMethod,
-            invoice_settings: { default_payment_method: paymentMethod }
-        })
+        var customer = null
+        if(customer_id) {
+            customer = await stripe.customers.retrieve(
+                customer_id
+            ).catch(err => err);
+        }else{
+            customer = await stripe.customers.create({
+                name: name || username || '', 
+                email,
+                payment_method: paymentMethod,
+                invoice_settings: { default_payment_method: paymentMethod }
+            })
+        }
 
         // const product = await stripe.products.create({
         //     name: "Monthly Subscription",
@@ -145,7 +153,8 @@ router.post('/create_subscription', async (req, res) => {
             message: `Subscription successful!`,
             customer,
             subscription,
-            clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret
+            clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
+            st:'lkds'
         });
     } catch (error) {
         // console.error(error);
