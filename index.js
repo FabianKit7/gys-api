@@ -28,7 +28,7 @@ const transporter = NodeMailer.createTransport({
 const send_email = (to, subject, content) => {
   // console.log(`to: ${to}, subject: ${subject}`);
   transporter.sendMail(
-    { from: "Grow-your-social hello@grow-your-social.com", to, subject, html: content, sender: { name: "Grow-your-social", email: "hello@grow-your-social.com" }, },
+    { from: "Grow-your-social support@grow-your-social.com", to, subject, html: content, sender: { name: "Grow-your-social", email: "support@grow-your-social.com" }, },
     (error, info) => {
       if (error) {
         console.log(error);
