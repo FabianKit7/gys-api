@@ -3,10 +3,9 @@ import express from 'express';
 import cors from 'cors'
 import NodeMailer from 'nodemailer'
 import dotenv from 'dotenv';
-// import stripeRoutes, { sendSMS } from './routes/stripeRoutes.js';
-import stripeRoutes from './routes/stripeRoutes.js';
+import stripeRoutes, { sendSMS } from './routes/stripeRoutes.js';
 import bodyParser from 'body-parser';
-// import axios from 'axios';
+import axios from 'axios';
 
 dotenv.config({ path: '.env' });
 const PORT = process.env.PORT || 8000
@@ -63,51 +62,51 @@ app.post('/api/send_email', async (req, res) => {
 
 
 // send_sms to
-// app.post('/api/send_sms', async (req, res) => {
-//   const { recipient, content } = req.body
-//   const apiKey = process.env.BREVO_SMS_API_KEY;
-//   const apiUrl = 'https://api.brevo.com/v3/transactionalSMS/sms';
+app.post('/api/send_sms', async (req, res) => {
+  const { recipient, content } = req.body
+  const apiKey = process.env.BREVO_SMS_API_KEY;
+  const apiUrl = 'https://api.brevo.com/v3/transactionalSMS/sms';
 
-//   const smsData = {
-//     type: 'transactional',
-//     unicodeEnabled: true,
-//     sender: 'gys',
-//     recipient,
-//     content
-//   };
+  const smsData = {
+    type: 'transactional',
+    unicodeEnabled: true,
+    sender: 'gys',
+    recipient,
+    content
+  };
 
-//   try {
-//     const resp = await axios
-//       .post(apiUrl, smsData, {
-//         headers: {
-//           'Content-Type': 'application/json',
-//           'api-key': apiKey,
-//           'Accept': 'application/json'
-//         }
-//       })
-//       .then((response) => {
-//         console.log('SMS sent successfully:', response.data);
-//         return ({ success: true, message: 'SMS sent successfully' })
-//       })
-//       .catch((error) => {
-//         console.error('Error sending SMS:', error);
-//         return ({ success: false, message: `Error sending SMS: ${error}` })
-//       });
-//     res.send(resp).status(200)
-//   } catch (error) {
-//     console.log("failed to send SMS");
-//     console.log(error);
-//     res.send(error).status(500)
-//   }
-// })
+  try {
+    const resp = await axios
+      .post(apiUrl, smsData, {
+        headers: {
+          'Content-Type': 'application/json',
+          'api-key': apiKey,
+          'Accept': 'application/json'
+        }
+      })
+      .then((response) => {
+        console.log('SMS sent successfully:', response.data);
+        return ({ success: true, message: 'SMS sent successfully' })
+      })
+      .catch((error) => {
+        console.error('Error sending SMS:', error);
+        return ({ success: false, message: `Error sending SMS: ${error}` })
+      });
+    res.send(resp).status(200)
+  } catch (error) {
+    console.log("failed to send SMS");
+    console.log(error);
+    res.send(error).status(500)
+  }
+})
 
-// app.get('/api/send_sms_test', async (req, res) => {
-//   // const username = 'dev_cent';
-//   // const email = 'paulinnocent05@gmail.com';
-//   // await sendSMS(`@${username} with email ${email} has just registered for a free trial. \n+15 portions cevapa kod cesma added.`)
-//   await sendSMS('Testing sms')
-//   res.send({ success: true, message: 'SMS sent successfully' })
-// })
+app.get('/api/send_sms_test', async (req, res) => {
+  // const username = 'dev_cent';
+  // const email = 'paulinnocent05@gmail.com';
+  // await sendSMS(`@${username} with email ${email} has just registered for a free trial. \n+15 portions cevapa kod cesma added.`)
+  await sendSMS('Testing sms')
+  res.send({ success: true, message: 'SMS sent successfully' })
+})
 
 app.get('/api/send_email_test', async (req, res) => {
   const email = 'paulinnocent05@gmail.com';
