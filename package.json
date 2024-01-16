@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@getbrevo/brevo": "^1.0.1",
+    "@slack/bolt": "^3.17.1",
     "@supabase/supabase-js": "^2.38.5",
     "axios": "^1.5.1",
     "cors": "^2.8.4",

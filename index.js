@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import stripeRoutes, { sendSMS } from './routes/stripeRoutes.js';
 import bodyParser from 'body-parser';
 import axios from 'axios';
+import Slack from "@slack/bolt";
 
 dotenv.config({ path: '.env' });
 const PORT = process.env.PORT || 8000
@@ -40,15 +41,68 @@ const send_email = (to, subject, content) => {
   )
 }
 
+// const slackApp = new Slack.App({
+//   signingSecret: process.env.SLACK_SIGNING_SECRET,
+//   token: process.env.SLACK_BOT_TOKEN,
+// });
 
 app.post('/api/send_email', async (req, res) => {
   send_email(req.body.email, req.body.subject, req.body.htmlContent)
   res.send({ success: true, message: 'Email sent successfully' })
 })
 
-
-
-
+app.post("/api/slack-notify", async (req, res) => {
+  const username = req.body.username;
+  const blocks = [
+    {
+      type: "section",
+      text: {
+        type: "plain_text",
+        text: `@${username} just registered for a free trial.`,
+        emoji: true,
+      },
+    },
+    {
+      type: "divider",
+    },
+    {
+      type: "actions",
+      elements: [
+        {
+          type: "button",
+          text: {
+            type: "plain_text",
+            text: "View",
+            emoji: true,
+          },
+          value: "dashboard",
+          url: "https://app.sproutysocial.com/admin/manage",
+        },
+      ],
+    },
+  ];
+  try {
+    const slackApp = new Slack.App({
+      signingSecret: process.env.SLACK_SIGNING_SECRET,
+      token: process.env.SLACK_BOT_TOKEN,
+    });
+    
+    const response = await slackApp.client.chat.postMessage({
+      token: process.env.SLACK_BOT_TOKEN,
+      channel: process.env.SLACK_CHANNEL,
+      text: "New Subscription!",
+      blocks,
+    });
+    // console.log(response);
+    if (response.ok) {
+      return res.send(response).status(200);
+    } else {
+      return res.send(response.message).status(500);
+    }
+  } catch (error) {
+    return res.send(error.message).status(500);
+  }
+});
 
 
 // var Brevo = require('@getbrevo/brevo');
@@ -116,12 +170,6 @@ app.get('/api/send_email_test', async (req, res) => {
   send_email(email, subject, content)
   res.send({ success: true, message: 'Email sent successfully' })
 })
-
-
-
-
-
-
 
 
 app.post('/api/send_email', async (req, res) => {
