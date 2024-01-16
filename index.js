@@ -90,7 +90,7 @@ app.post("/api/slack-notify", async (req, res) => {
             emoji: true,
           },
           value: "dashboard",
-          url: "https://app.sproutysocial.com/admin/manage",
+          url: "https://app.grow-your-social.com/admin/manage",
         },
       ],
     },

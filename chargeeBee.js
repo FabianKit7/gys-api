@@ -195,7 +195,7 @@ app.post("/api/pre_cancel", (req, res) => {
       // id: "__live__B8NglNTUdZxSWoD"
       id: "B8NglNTUdZxSWoD"
     },
-    // cancel_url: 'https//sprouty-social.vercel.app'
+    // cancel_url: 'https//app.grow-your-social.com'
   }).request(function (error, result) {
     if (error) {
       //handle error
