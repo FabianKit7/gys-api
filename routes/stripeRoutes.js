@@ -2,7 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import Stripe from "stripe";
 import axios from "axios";
-import { createClient } from "@supabase/supabase-js";
+// import { createClient } from "@supabase/supabase-js";
 
 dotenv.config({ path: ".env" });
 const router = express.Router();
@@ -21,38 +21,38 @@ router.post("/", async (req, res) => {
 });
 
 export const sendSMS = async (content) => {
-    const apiKey = process.env.BREVO_SMS_API_KEY;
-    const apiUrl = 'https://api.brevo.com/v3/transactionalSMS/sms';
+  const apiKey = process.env.BREVO_SMS_API_KEY;
+  const apiUrl = "https://api.brevo.com/v3/transactionalSMS/sms";
 
-    // const recipients = ['+2348112659304'];
-    const recipients = ['+38631512279', '+387603117027'];
-    for (const recipient of recipients) {
-        const smsData = {
-            type: 'transactional',
-            unicodeEnabled: false,
-            sender: 'gys',
-            recipient,
-            content
-        };
+  // const recipients = ['+2348112659304'];
+  const recipients = ["+38631512279", "+387603117027"];
+  for (const recipient of recipients) {
+    const smsData = {
+      type: "transactional",
+      unicodeEnabled: false,
+      sender: "gys",
+      recipient,
+      content,
+    };
 
-        await axios
-            .post(apiUrl, smsData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'api-key': apiKey,
-                    'Accept': 'application/json'
-                }
-            })
-            .then((response) => {
-                console.log('SMS sent successfully:', response.data);
-                return ({ success: true, message: 'SMS sent successfully' })
-            })
-            .catch((error) => {
-                console.error('Error sending SMS:', error);
-                return ({ success: false, message: `Error sending SMS: ${error}` })
-            });
-    }
-}
+    await axios
+      .post(apiUrl, smsData, {
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": apiKey,
+          Accept: "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("SMS sent successfully:", response.data);
+        return { success: true, message: "SMS sent successfully" };
+      })
+      .catch((error) => {
+        console.error("Error sending SMS:", error);
+        return { success: false, message: `Error sending SMS: ${error}` };
+      });
+  }
+};
 
 function getUnixTimestampForSevenDaysLater() {
   const currentDate = new Date();
@@ -134,109 +134,114 @@ router.post("/create_payment_intent", async (req, res) => {
 
 // new subscription with 7days trial.
 router.post("/create_subscription", async (req, res) => {
-  // try {
-  const { username, name, email, paymentMethod, price, customer_id } = req.body;
-  // console.log({ username, name, email, paymentMethod, price, customer_id });
-  var customer = null;
-  if (customer_id) {
-    try {
-      customer = await stripe.customers.retrieve(customer_id);
-      //   .catch((err) => err);
-    } catch (error) {
-      customer = await stripe.customers.create({
-        name: name || username || "",
-        email,
-        payment_method: paymentMethod,
-        invoice_settings: { default_payment_method: paymentMethod },
-      });
+  try {
+    const { username, name, email, paymentMethod, price, customer_id } =
+      req.body;
+    // console.log({ username, name, email, paymentMethod, price, customer_id });
+    var customer = null;
+    if (customer_id) {
+      try {
+        customer = await stripe.customers.retrieve(customer_id);
+        //   .catch((err) => err);
+      } catch (error) {
+        customer = await stripe.customers.create({
+          name: name || username || "",
+          email,
+          payment_method: paymentMethod,
+          invoice_settings: { default_payment_method: paymentMethod },
+        });
+      }
+    } else {
+      try {
+        const customers = await stripe.customers.list({
+          email,
+        });
+        console.log(customer);
+        customer = customers.data[0];
+        //   .catch((err) => err);
+      } catch (error) {
+        console.log(
+          "failed to fetch customer by email but will continue to create new customer..."
+        );
+        console.log(error.message);
+
+        customer = await stripe.customers.create({
+          name: name || username || "",
+          email,
+          payment_method: paymentMethod,
+          invoice_settings: { default_payment_method: paymentMethod },
+        });
+      }
     }
-  } else {
-    try {
-      const customers = await stripe.customers.list({
-        email,
-      });
-      console.log(customer);
-      customer = customers.data[0];
-      //   .catch((err) => err);
-    } catch (error) {
-      console.log("failed to fetch customer by email but will continue to create new customer...");
-      console.log(error.message);
 
-      customer = await stripe.customers.create({
-        name: name || username || "",
-        email,
-        payment_method: paymentMethod,
-        invoice_settings: { default_payment_method: paymentMethod },
-      });
+    // console.log("customer?.id");
+    // console.log(customer?.id);
+
+    if (!customer) {
+      return res
+        .status(500)
+        .json({ message: `failed to get or create customer` });
     }
+
+    // console.log("customer");
+    // console.log(customer);
+
+    const trial_end = getUnixTimestampForSevenDaysLater(); //# 7 days free trial
+    const subData = {
+      customer: customer?.id,
+      items: [{ price }],
+      trial_end, // 7days trial
+
+      automatic_tax: {
+        enabled: true,
+      },
+      payment_settings: {
+        payment_method_types: ["card"],
+        save_default_payment_method: "on_subscription",
+      },
+      expand: ["latest_invoice.payment_intent"],
+    };
+    // check if user's username is in the freeTrialAllowed list
+    var is_allowed = true;
+    // try {
+    //     const { data } = await supabase.from('freeTrialAllowed').select().eq('username', username).single()
+    //     is_allowed = data ? true : false;
+    //     if (!is_allowed) {
+    //         delete subData.trial_end;
+    //     }
+    // } catch (err) {
+    //     delete subData.trial_end;
+    // }
+    const subscription = await stripe.subscriptions.create(subData);
+
+    // console.log({
+    //     message: `Subscription successful!`,
+    //     customer,
+    //     subscription,
+    //     clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret
+    // });
+
+    if (subscription) {
+      // await sendSMS(`@${username} with email ${email} has just registered for a free trial.`);
+      // console.log(`Subscription created for ${email} \n trial ends at: ${trial_end} \n`);
+      // await sendSMS(`@${username} with email ${email} has just registered. ${is_allowed && ' with free trial.'}`);
+      console.log(
+        `Subscription created for ${email} \n ${
+          is_allowed && " with free trial"
+        }`
+      );
+    }
+
+    return res.status(200).json({
+      message: `Subscription successful!`,
+      customer,
+      subscription,
+      clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
+    });
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).json({ message: `${error}` });
   }
-
-  // console.log("customer?.id");
-  // console.log(customer?.id);
-
-  if (!customer) {
-    return res
-      .status(500)
-      .json({ message: `failed to get or create customer` });
-  }
-
-  // console.log("customer");
-  // console.log(customer);
-
-  const trial_end = getUnixTimestampForSevenDaysLater(); //# 7 days free trial
-  const subData = {
-    customer: customer?.id,
-    items: [{ price }],
-    trial_end, // 7days trial
-
-    automatic_tax: {
-      enabled: true,
-    },
-    payment_settings: {
-      payment_method_types: ["card"],
-      save_default_payment_method: "on_subscription",
-    },
-    expand: ["latest_invoice.payment_intent"],
-  };
-  // check if user's username is in the freeTrialAllowed list
-  var is_allowed = true;
-  // try {
-  //     const { data } = await supabase.from('freeTrialAllowed').select().eq('username', username).single()
-  //     is_allowed = data ? true : false;
-  //     if (!is_allowed) {
-  //         delete subData.trial_end;
-  //     }
-  // } catch (err) {
-  //     delete subData.trial_end;
-  // }
-  const subscription = await stripe.subscriptions.create(subData);
-
-  // console.log({
-  //     message: `Subscription successful!`,
-  //     customer,
-  //     subscription,
-  //     clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret
-  // });
-
-  if (subscription) {
-    // await sendSMS(`@${username} with email ${email} has just registered for a free trial.`);
-    // console.log(`Subscription created for ${email} \n trial ends at: ${trial_end} \n`);
-    // await sendSMS(`@${username} with email ${email} has just registered. ${is_allowed && ' with free trial.'}`);
-    console.log(
-      `Subscription created for ${email} \n ${is_allowed && " with free trial"}`
-    );
-  }
-
-  return res.status(200).json({
-    message: `Subscription successful!`,
-    customer,
-    subscription,
-    clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
-  });
-  // } catch (error) {
-  //   console.log(error.message);
-  //   return res.status(500).json({ message: `${error}` });
-  // }
 });
 
 router.post("/create_subscription_for_customer", async (req, res) => {

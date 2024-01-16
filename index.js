@@ -52,13 +52,13 @@ app.post('/api/send_email', async (req, res) => {
 })
 
 app.post("/api/slack-notify", async (req, res) => {
-  const username = req.body.username;
+  const {username, cancellation} = req.body;
   const blocks = [
     {
       type: "section",
       text: {
         type: "plain_text",
-        text: `@${username} just registered for a free trial.`,
+        text: `@${username} ${cancellation ? "cancelled their subscription":"just registered for a free trial."}`,
         emoji: true,
       },
     },
@@ -89,8 +89,8 @@ app.post("/api/slack-notify", async (req, res) => {
     
     const response = await slackApp.client.chat.postMessage({
       token: process.env.SLACK_BOT_TOKEN,
-      channel: process.env.SLACK_CHANNEL,
-      text: "New Subscription!",
+      channel: cancellation ? 'new-cancellations' : 'new-subscriptions',
+      text: cancellation ? "New Cancellation":"New Subscription!",
       blocks,
     });
     // console.log(response);
