@@ -15,53 +15,66 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 const send_email = (to, subject, content) => {
-  const transporter = NodeMailer.createTransport({
-    host: process.env.SMPT_HOST,
-    port: process.env.SMPT_PORT,
-    debug: true,
-    auth: {
-      user: process.env.SMPT_LOGIN,
-      pass: process.env.SMPT_KEY,
-    },
-  });
-  // console.log(`to: ${to}, subject: ${subject}`);
-  transporter.sendMail(
-    {
-      from: "Grow-your-social support@grow-your-social.com",
-      to,
-      subject,
-      html: content,
-      sender: {
-        name: "Grow-your-social",
-        email: "support@grow-your-social.com",
+  if (!to || !subject || !content) {
+    console.log("failed to send email: params missing");
+    console.log("to:", to);
+    console.log("subject:", subject);
+    !content && console.log("no content");
+    return { success: false, message: "failed to send email: params missing" };
+  }
+
+  try {
+    const transporter = NodeMailer.createTransport({
+      host: process.env.SMPT_HOST,
+      port: process.env.SMPT_PORT,
+      debug: true,
+      auth: {
+        user: process.env.SMPT_LOGIN,
+        pass: process.env.SMPT_KEY,
       },
-    },
-    (error, info) => {
-      if (error) {
-        console.log(
-          "failed to sent email to: " + info?.accepted?.[0] + " due to: "
-        );
-        console.log(error.message);
-        console.log(error);
-        console.log(error.message);
-        return { success: false, message: error.message };
-      } else {
-        console.log("email sent to: " + info.accepted[0]);
-        return { success: true, message: info.response };
+    });
+    // console.log(`to: ${to}, subject: ${subject}`);
+    transporter.sendMail(
+      {
+        from: "Grow-your-social support@grow-your-social.com",
+        to,
+        subject,
+        html: content,
+        sender: {
+          name: "Grow-your-social",
+          email: "support@grow-your-social.com",
+        },
+      },
+      (error, info) => {
+        if (error) {
+          console.log(
+            "failed to sent email to: " + info?.accepted?.[0] + " due to: "
+          );
+          console.log(error.message);
+          console.log(error);
+          console.log(error.message);
+          return { success: false, message: error.message };
+        } else {
+          console.log("email sent to: " + info?.accepted?.[0]);
+          return { success: true, message: info?.response };
+        }
       }
-    }
-  );
+    );
+  } catch (error) {
+    console.log(
+      "2_ failed to sent email to: " + info?.accepted?.[0] + " due to: "
+    );
+    console.log(error.message);
+    console.log(error);
+    console.log(error.message);
+    return { success: false, message: error.message };
+  }
 };
 
 // const slackApp = new Slack.App({
 //   signingSecret: process.env.SLACK_SIGNING_SECRET,
 //   token: process.env.SLACK_BOT_TOKEN,
 // });
-
-app.post("/api/send_email", async (req, res) => {
-  send_email(req.body.email, req.body.subject, req.body.htmlContent);
-  res.send({ success: true, message: "Email sent successfully" });
-});
 
 app.post("/api/slack-notify", async (req, res) => {
   const { username, cancellation } = req.body;
