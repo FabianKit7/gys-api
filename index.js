@@ -39,8 +39,10 @@ const send_email = (to, subject, content) => {
     (error, info) => {
       if (error) {
         console.log(
-          "failed to sent email to: " + info.accepted[0] + "due to: "
+          "failed to sent email to: " + info?.accepted?.[0] + " due to: "
         );
+        console.log(error.message);
+        console.log(error);
         console.log(error.message);
         return { success: false, message: error.message };
       } else {
@@ -101,7 +103,7 @@ app.post("/api/slack-notify", async (req, res) => {
       token: process.env.SLACK_BOT_TOKEN,
     });
 
-    const channel = cancellation ? "New Cancellation" : "New Subscription!";
+    const channel = cancellation ? "new-cancellation" : "new-subscriptions";
 
     const response = await slackApp.client.chat.postMessage({
       token: process.env.SLACK_BOT_TOKEN,
@@ -147,7 +149,7 @@ app.post("/api/send_sms", async (req, res) => {
   const smsData = {
     type: "transactional",
     unicodeEnabled: true,
-    sender: "gys",
+    sender: "GrowYS",
     recipient,
     content,
   };

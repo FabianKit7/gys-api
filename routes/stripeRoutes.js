@@ -30,7 +30,7 @@ export const sendSMS = async (content) => {
     const smsData = {
       type: "transactional",
       unicodeEnabled: false,
-      sender: "gys",
+      sender: "GrowYS",
       recipient,
       content,
     };
