@@ -17,8 +17,8 @@ app.use(cors());
 const send_email = (to, subject, content) => {
   if (!to || !subject || !content) {
     console.log("failed to send email: params missing");
-    console.log("to:", to);
-    console.log("subject:", subject);
+    !to && console.log("to:", to);
+    !subject && console.log("subject:", subject);
     !content && console.log("no content");
     return { success: false, message: "failed to send email: params missing" };
   }
