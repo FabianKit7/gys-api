@@ -95,7 +95,7 @@ router.post("/create_setupIntent", async (req, res) => {
       options = { ...options, customer: customer_new?.id };
     }
 
-    const intent = await stripe.setupIntents.create(options);
+    const intent = await stripe.setupIntents.create({ ...options });
 
     return res.status(200).json({
       intent,
@@ -134,6 +134,36 @@ router.post("/create_payment_intent", async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: `Internal server error: ${error}` });
+  }
+});
+
+router.post("/updateCustomer", async (req, res) => {
+  const { customer_id, address } = req.body;
+  try {
+    var address_ = address;
+    if (!address) {
+      address_ = {
+        city: "Cityville",
+        country: "US", // Two-letter country code (ISO 3166-1 alpha-2).
+        line1: "123 Main St", // e.g., street, PO Box, or company name
+        // line2: "Bold Castle", // e.g., apartment, suite, unit, or building
+        postal_code: "12345",
+        state: "CA",
+      };
+    }
+
+    const customer = await stripe.customers.update(customer_id, {
+      address: address_,
+    });
+
+    return res.status(200).json({ message: `updated`, customer });
+  } catch (error) {
+    console.log("failed to create subscription");
+    console.log(error.message);
+    console.log(error);
+    console.log(error.message);
+    console.log("failed to create subscription");
+    return res.status(500).json({ message: `${error.message}` });
   }
 });
 
@@ -194,9 +224,6 @@ router.post("/create_subscription", async (req, res) => {
       }
     }
 
-    // console.log("customer?.id");
-    // console.log(customer?.id);
-
     if (!customer) {
       return res
         .status(500)
@@ -212,9 +239,9 @@ router.post("/create_subscription", async (req, res) => {
       items: [{ price }],
       trial_end, // 7days trial
 
-      // automatic_tax: {
-      //   enabled: true,
-      // },
+      automatic_tax: {
+        enabled: true,
+      },
       payment_settings: {
         payment_method_types: ["card"],
         save_default_payment_method: "on_subscription",
