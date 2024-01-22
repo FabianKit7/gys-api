@@ -103,7 +103,7 @@ app.post("/api/slack-notify", async (req, res) => {
       token: process.env.SLACK_BOT_TOKEN,
     });
 
-    const channel = cancellation ? "new-cancellation" : "new-subscriptions";
+    const channel = cancellation ? "new-cancellations" : "new-subscriptions";
 
     const response = await slackApp.client.chat.postMessage({
       token: process.env.SLACK_BOT_TOKEN,
