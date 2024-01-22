@@ -192,9 +192,9 @@ router.post("/create_subscription", async (req, res) => {
       items: [{ price }],
       trial_end, // 7days trial
 
-      automatic_tax: {
-        enabled: true,
-      },
+      // automatic_tax: {
+      //   enabled: true,
+      // },
       payment_settings: {
         payment_method_types: ["card"],
         save_default_payment_method: "on_subscription",
