@@ -63,7 +63,7 @@ function getUnixTimestampForSevenDaysLater() {
 
 router.post("/create_setupIntent", async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { name, email, username } = req.body;
     var options = {
       // In the latest version of the API, specifying the `automatic_payment_methods` parameter is optional because Stripe enables its functionality by default.
       automatic_payment_methods: { enabled: true },
@@ -81,10 +81,15 @@ router.post("/create_setupIntent", async (req, res) => {
       options = { ...options, customer: customer?.id };
     }
     if (!customer && email) {
-      const customer_new = await stripe.customers.create({
+      var createCustomerData = {
         name,
         email,
-      });
+      };
+      if (username) {
+        createCustomerData = { ...createCustomerData, metadata: { username } };
+      }
+
+      const customer_new = await stripe.customers.create(createCustomerData);
       console.log(`created customer for: ${customer_new.email}`);
       customer = customer_new;
       options = { ...options, customer: customer_new?.id };
@@ -144,12 +149,19 @@ router.post("/create_subscription", async (req, res) => {
         customer = await stripe.customers.retrieve(customer_id);
         //   .catch((err) => err);
       } catch (error) {
-        customer = await stripe.customers.create({
+        var createCustomerData = {
           name: name || username || "",
           email,
           payment_method: paymentMethod,
           invoice_settings: { default_payment_method: paymentMethod },
-        });
+        };
+        if (username) {
+          createCustomerData = {
+            ...createCustomerData,
+            metadata: { username },
+          };
+        }
+        customer = await stripe.customers.create(createCustomerData);
       }
     } else {
       try {
@@ -165,12 +177,20 @@ router.post("/create_subscription", async (req, res) => {
         );
         console.log(error.message);
 
-        customer = await stripe.customers.create({
+        var createCustomerData = {
           name: name || username || "",
           email,
           payment_method: paymentMethod,
           invoice_settings: { default_payment_method: paymentMethod },
-        });
+        };
+        if (username) {
+          createCustomerData = {
+            ...createCustomerData,
+            metadata: { username },
+          };
+        }
+
+        customer = await stripe.customers.create(createCustomerData);
       }
     }
 
@@ -239,8 +259,12 @@ router.post("/create_subscription", async (req, res) => {
       clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
     });
   } catch (error) {
+    console.log("failed to create subscription");
     console.log(error.message);
-    return res.status(500).json({ message: `${error}` });
+    console.log(error);
+    console.log(error.message);
+    console.log("failed to create subscription");
+    return res.status(500).json({ message: `${error.message}` });
   }
 });
 
