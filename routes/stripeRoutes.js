@@ -21,6 +21,7 @@ router.get("/invoice/:customer_id", async (req, res) => {
 
   const invoices = await stripe.invoices.list({
     limit: 3,
+    customer: customer_id
   });
   return res.status(200).json({
     invoices,
