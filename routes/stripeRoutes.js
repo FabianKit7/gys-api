@@ -239,9 +239,9 @@ router.post("/create_subscription", async (req, res) => {
       items: [{ price }],
       trial_end, // 7days trial
 
-      automatic_tax: {
-        enabled: true,
-      },
+      // automatic_tax: {
+      //   enabled: true,
+      // },
       payment_settings: {
         payment_method_types: ["card"],
         save_default_payment_method: "on_subscription",
@@ -288,7 +288,7 @@ router.post("/create_subscription", async (req, res) => {
   } catch (error) {
     console.log("failed to create subscription");
     console.log(error.message);
-    console.log(error);
+    // console.log(error);
     console.log(error.message);
     console.log("failed to create subscription");
     return res.status(500).json({ message: `${error.message}` });
