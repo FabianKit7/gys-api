@@ -181,8 +181,12 @@ app.post("/api/send_sms", async (req, res) => {
         return { success: true, message: "SMS sent successfully" };
       })
       .catch((error) => {
-        console.error("Error sending SMS:", error);
-        return { success: false, message: `Error sending SMS: ${error}` };
+        console.error("Error sending SMS:", error.message);
+        return {
+          success: false,
+          message: `Error sending SMS: ${error.message}`,
+          error,
+        };
       });
     res.send(resp).status(200);
   } catch (error) {
