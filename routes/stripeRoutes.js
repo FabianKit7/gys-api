@@ -16,6 +16,17 @@ const stripe = new Stripe(SK);
 // const supabaseKey = process.env.SUPABASE_ANON_KEY;
 // const supabase = createClient(supabaseUrl, supabaseKey);
 
+router.get("/invoice/:customer_id", async (req, res) => {
+  const customer_id = req.params.customer_id;
+
+  const invoices = await stripe.invoices.list({
+    limit: 3,
+  });
+  return res.status(200).json({
+    invoices,
+  });
+});
+
 router.post("/", async (req, res) => {
   return res.json({});
 });
