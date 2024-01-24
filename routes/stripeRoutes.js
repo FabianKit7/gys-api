@@ -19,20 +19,18 @@ const stripe = new Stripe(SK);
 router.get("/invoice/:customer_id", async (req, res) => {
   try {
     const customer_id = req.params.customer_id;
-  
+
     const invoices = await stripe.invoices.list({
       limit: 3,
-      customer: customer_id
+      customer: customer_id,
     });
     return res.status(200).json({
       invoices,
     });
-    
   } catch (error) {
     return res.status(500).json({
       message: error.message,
     });
-    
   }
 });
 
@@ -157,8 +155,8 @@ router.post("/create_payment_intent", async (req, res) => {
   }
 });
 
-router.post("/updateCustomer", async (req, res) => {
-  const { customer_id, address } = req.body;
+router.post("/updateCustomerAddress", async (req, res) => {
+  const { customer_id, email, address } = req.body;
   try {
     var address_ = address;
     if (!address) {
@@ -172,7 +170,16 @@ router.post("/updateCustomer", async (req, res) => {
       };
     }
 
-    const customer = await stripe.customers.update(customer_id, {
+    var customerId = customer_id;
+    if (!customer_id) {
+      const customers = await stripe.customers.list({
+        limit: 1,
+        email,
+      });
+      customerId = customers.data[0].id;
+    }
+
+    const customer = await stripe.customers.update(customerId, {
       address: address_,
     });
 
