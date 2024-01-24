@@ -17,15 +17,23 @@ const stripe = new Stripe(SK);
 // const supabase = createClient(supabaseUrl, supabaseKey);
 
 router.get("/invoice/:customer_id", async (req, res) => {
-  const customer_id = req.params.customer_id;
-
-  const invoices = await stripe.invoices.list({
-    limit: 3,
-    customer: customer_id
-  });
-  return res.status(200).json({
-    invoices,
-  });
+  try {
+    const customer_id = req.params.customer_id;
+  
+    const invoices = await stripe.invoices.list({
+      limit: 3,
+      customer: customer_id
+    });
+    return res.status(200).json({
+      invoices,
+    });
+    
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+    
+  }
 });
 
 router.post("/", async (req, res) => {
