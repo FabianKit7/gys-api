@@ -126,7 +126,7 @@ app.post("/api/customer_list", (req, res) => {
       res.send({})
     } else {
       var customer = {};
-      for (var i = 0; i < result.list.length; i++) {
+      for (var i = 0; i < result.list?.length; i++) {
         var entry = result.list[i]
         // console.log(entry);
         customer = entry.customer;
@@ -177,7 +177,7 @@ app.post("/api/subscription_list", (req, res) => {
     } else {
       var customer_subscription = {};
       // console.log(result?.list?.[0]?.subscription);
-      for (var i = 0; i < result.list.length; i++) {
+      for (var i = 0; i < result.list?.length; i++) {
         var entry = result.list[i]
         customer_subscription = entry.subscription;
       }
