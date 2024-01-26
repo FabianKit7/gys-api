@@ -155,11 +155,10 @@ app.post("/api/slack-notify", async (req, res) => {
 
 // send_sms to
 app.post("/api/send_sms", async (req, res) => {
-  if(!recipient){
+  const { recipient, content } = req.body;
+  if (!recipient) {
     res.send(error).status(500);
   }
-  
-  const { recipient, content } = req.body;
   const apiKey = process.env.BREVO_SMS_API_KEY;
   const apiUrl = "https://api.brevo.com/v3/transactionalSMS/sms";
 
