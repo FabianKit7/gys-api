@@ -194,42 +194,46 @@ router.post("/updateCustomerAddress", async (req, res) => {
   }
 });
 
-// router.post("/updateCustomerTax", async (req, res) => {
-//   const { customer_id, email, tax_id, company_name, country_enum } = req.body;
-//   try {
-//     var customerId = customer_id;
-//     if (!customer_id) {
-//       const customers = await stripe.customers.list({
-//         limit: 1,
-//         email,
-//       });
-//       customerId = customers.data[0].id;
-//     }
+router.post("/updateCustomerTax", async (req, res) => {
+  const { customer_id, email, tax_id, company_name, country_enum } = req.body;
+  try {
+    var customerId = customer_id;
+    if (!customer_id) {
+      const customers = await stripe.customers.list({
+        limit: 1,
+        email,
+      });
+      customerId = customers.data[0].id;
+    }
 
-//     const customer = await stripe.customers.update(customerId, {
-//       tax_info: {
-//         type: 'eu_vat',
-//         value: 'your_vat_number',  // Replace with the customer's VAT number
-//         country: 'customer_country_code',  // Replace with the customer's country code (e.g., 'DE' for Germany)
-//       },
-//       metadata: {
-//         company_name,
-//       },
-//     });
+    const customer = await stripe.customers.update(customerId, {
+      metadata: {
+        company_name,
+      },
+    });
 
-//     return res.status(200).json({ message: `updated`, customer });
-//   } catch (error) {
-//     console.log("failed to create subscription");
-//     console.log(error.message);
-//     console.log(error);
-//     console.log(error.message);
-//     console.log("failed to create subscription");
-//     return res.status(500).json({ message: `${error.message}` });
-//   }
-// });
+    const customerTaxRes = await stripe.customers.createTaxId(customerId, {
+      type: country_enum,
+      value: tax_id,
+    });
+
+    console.log("customerTaxRes");
+    console.log(customerTaxRes);
+
+    return res
+      .status(200)
+      .json({ message: `updated`, customer, customerTaxRes });
+  } catch (error) {
+    console.log("failed to create subscription");
+    console.log(error.message);
+    console.log(error);
+    console.log(error.message);
+    console.log("failed to create subscription");
+    return res.status(500).json({ message: `${error.message}` });
+  }
+});
 
 // new subscription with 7days trial.
-
 router.post("/create_subscription", async (req, res) => {
   try {
     const { username, name, email, paymentMethod, price, customer_id } =
