@@ -325,6 +325,11 @@ router.post("/create_subscription", async (req, res) => {
     // } catch (err) {
     //     delete subData.trial_end;
     // }
+
+    if (!customer.address) {
+      delete subData.automatic_tax;
+    }
+    
     const subscription = await stripe.subscriptions.create(subData);
 
     // console.log({
