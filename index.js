@@ -195,7 +195,7 @@ app.post("/api/send_sms", async (req, res) => {
   } catch (error) {
     console.log("failed to send SMS");
     console.log(error?.message);
-    res.send(error).status(500);
+    res.send({ message: error?.message || "failed to send SMS" }).status(500);
   }
 });
 
