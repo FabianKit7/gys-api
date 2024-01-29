@@ -208,6 +208,9 @@ router.post("/updateCustomerTax", async (req, res) => {
 
     const customer = await stripe.customers.update(customerId, {
       name: company_name,
+      // tax: {
+      //   ip_address
+      // },
       metadata: {
         company_name,
       },
@@ -333,7 +336,7 @@ router.post("/create_subscription", async (req, res) => {
       delete subData.automatic_tax;
     }
     
-    const subscription = await stripe.subscriptions.create(subData);
+    const subscription = await stripe.subscriptions.create({...subData});
 
     // console.log({
     //     message: `Subscription successful!`,
