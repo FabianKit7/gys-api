@@ -207,6 +207,7 @@ router.post("/updateCustomerTax", async (req, res) => {
     }
 
     const customer = await stripe.customers.update(customerId, {
+      name: company_name,
       metadata: {
         company_name,
       },
@@ -215,20 +216,21 @@ router.post("/updateCustomerTax", async (req, res) => {
     const customerTaxRes = await stripe.customers.createTaxId(customerId, {
       type: country_enum,
       value: tax_id,
+      // expand: 'taxability_override'
     });
 
-    console.log("customerTaxRes");
-    console.log(customerTaxRes);
+    // console.log("customerTaxRes");
+    // console.log(customerTaxRes);
 
     return res
       .status(200)
       .json({ message: `updated`, customer, customerTaxRes });
   } catch (error) {
-    console.log("failed to create subscription");
+    console.log("failed to updateCustomerTax");
     console.log(error.message);
-    console.log(error);
-    console.log(error.message);
-    console.log("failed to create subscription");
+    // console.log(error);
+    // console.log(error.message);
+    console.log("failed to updateCustomerTax");
     return res.status(500).json({ message: `${error.message}` });
   }
 });
@@ -264,8 +266,9 @@ router.post("/create_subscription", async (req, res) => {
         const customers = await stripe.customers.list({
           email,
         });
-        console.log(customer);
         customer = customers.data[0];
+        console.log("customer");
+        console.log(customer);
         //   .catch((err) => err);
       } catch (error) {
         console.log(
