@@ -302,6 +302,10 @@ router.post("/create_subscription", async (req, res) => {
         .json({ message: `failed to get or create customer` });
     }
 
+    await stripe.paymentMethods.attach(paymentMethod, {
+      customer: customer?.id,
+    });
+
     // console.log("customer");
     // console.log(customer);
 
@@ -335,8 +339,8 @@ router.post("/create_subscription", async (req, res) => {
     if (!customer.address) {
       delete subData.automatic_tax;
     }
-    
-    const subscription = await stripe.subscriptions.create({...subData});
+
+    const subscription = await stripe.subscriptions.create({ ...subData });
 
     // console.log({
     //     message: `Subscription successful!`,
@@ -393,7 +397,8 @@ router.post("/create_subscription_for_customer", async (req, res) => {
       return res.status(200).json({
         message: `Subscription successful!`,
         subscription,
-        clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
+        clientSecret:
+          subscription?.latest_invoice?.payment_intent?.client_secret,
       });
     }
     return res.status(200).json({
