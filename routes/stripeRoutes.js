@@ -302,9 +302,13 @@ router.post("/create_subscription", async (req, res) => {
         .json({ message: `failed to get or create customer` });
     }
 
-    await stripe.paymentMethods.attach(paymentMethod, {
-      customer: customer?.id,
-    });
+    try {
+      await stripe.paymentMethods.attach(paymentMethod, {
+        customer: customer?.id,
+      });
+    } catch (error) {
+      console.log(`Failed to attach payment method to ${customer?.id}`);
+    }
 
     // console.log("customer");
     // console.log(customer);
