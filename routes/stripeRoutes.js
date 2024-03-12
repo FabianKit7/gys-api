@@ -386,14 +386,18 @@ router.post("/create_subscription_for_customer", async (req, res) => {
       expand: ["latest_invoice.payment_intent"],
     });
 
-    if (subscription) {
+    if (subscription && subscription.status === "active") {
       console.log(
         `Subscription created for customer: ${customer_id}; direct billing \n`
       );
+      return res.status(200).json({
+        message: `Subscription successful!`,
+        subscription,
+        clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
+      });
     }
-
     return res.status(200).json({
-      message: `Subscription successful!`,
+      message: `Subscription was unsuccessful!. \nStatus: ${subscription.status}`,
       subscription,
       clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
     });
