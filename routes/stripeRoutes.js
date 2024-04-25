@@ -362,6 +362,35 @@ router.post("/create_subscription", async (req, res) => {
           is_allowed && " with free trial"
         }`
       );
+
+      // try {
+      //   const paymentMethodResult = await stripe.paymentMethods.attach(
+      //     paymentMethod,
+      //     { customer: customer?.id }
+      //   );
+      //   // .catch((err) => err);
+      //   console.log("paymentMethod sucessfully attached");
+      //   console.log(paymentMethodResult);
+      // } catch (error) {
+      //   console.log("paymentMethodResult error: " + error);
+      // }
+
+      try {
+        await stripe.customers
+          .update(customer.id, {
+            invoice_settings: {
+              default_payment_method: paymentMethod,
+            },
+          })
+          .then(() => {
+            console.log("Customer default payment source updated!");
+          })
+          .catch((err) => {
+            console.error("Error updating customer:", err);
+          });
+      } catch (error) {
+        console.log("faild to update Customer default payment source");
+      }
     }
 
     return res.status(200).json({
