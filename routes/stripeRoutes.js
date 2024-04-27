@@ -302,6 +302,7 @@ router.post("/create_subscription", async (req, res) => {
         .json({ message: `failed to get or create customer` });
     }
 
+    // attach paymentMethod
     try {
       await stripe.paymentMethods.attach(paymentMethod, {
         customer: customer?.id,
@@ -363,18 +364,7 @@ router.post("/create_subscription", async (req, res) => {
         }`
       );
 
-      // try {
-      //   const paymentMethodResult = await stripe.paymentMethods.attach(
-      //     paymentMethod,
-      //     { customer: customer?.id }
-      //   );
-      //   // .catch((err) => err);
-      //   console.log("paymentMethod sucessfully attached");
-      //   console.log(paymentMethodResult);
-      // } catch (error) {
-      //   console.log("paymentMethodResult error: " + error);
-      // }
-
+      // update default payment source
       try {
         await stripe.customers
           .update(customer.id, {
@@ -416,6 +406,9 @@ router.post("/create_subscription_for_customer", async (req, res) => {
     const subscription = await stripe.subscriptions.create({
       customer: customer_id,
       items: [{ price }],
+      automatic_tax: {
+        enabled: true,
+      },
       payment_settings: {
         payment_method_types: ["card"],
         save_default_payment_method: "on_subscription",
@@ -435,7 +428,7 @@ router.post("/create_subscription_for_customer", async (req, res) => {
       });
     }
     return res.status(200).json({
-      message: `Subscription was unsuccessful!. \nStatus: ${subscription.status}`,
+      message: `Subscription was successful!. \nStatus: ${subscription.status}`,
       subscription,
       clientSecret: subscription?.latest_invoice?.payment_intent?.client_secret,
     });
