@@ -73,7 +73,7 @@ const send_email = (to, subject, content) => {
     );
   } catch (error) {
     console.log(
-      "2_ failed to sent email to: " + info?.accepted?.[0] + " due to: "
+      "failed to sent email due to: "
     );
     console.log(error.message);
     console.log(error);
@@ -139,7 +139,7 @@ const processUsersInBatches = async (users, callback) => {
   const requestsPerMinuteLimit = 25;
   let apiRequestCounter = 0;
   let retries = 0;
-  const maxRetries = 30;
+  const maxRetries = 10;
   // const retryDelay = 30000; // 30 seconds
   const doneList = [];
   let lastRequestTime = Date.now();
@@ -278,7 +278,7 @@ const updateUserGraphData = async (user, vuser) => {
     })
     .eq("id", user.id); // 0.3s average
   console.log(
-    `supabase update took: ${(start_supabase_update - Date.now()) / 1000}`
+    `supabase update took: ${(Date.now() - start_supabase_update) / 1000}`
   );
 
   if (error) {
@@ -291,7 +291,7 @@ const updateUserGraphData = async (user, vuser) => {
   }
 };
 
-// updateUsersGraphDataCron();
+updateUsersGraphDataCron();
 
 // Schedule the cron job to run every day at 7am
 cron.schedule("0 6 * * *", updateUsersGraphDataCron);
